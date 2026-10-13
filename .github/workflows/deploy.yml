@@ -48,10 +48,10 @@ jobs:
 
       - name: Download task definition
         id: download-taskdef
-        uses: aws-actions/amazon-ecs-download-task-definition@v1
+        uses: aws-actions/amazon-ecs-download-task-definition@v2
         with:
-          task-definition = ${{ inputs.environment }}-task
-          cluster = ${{ inputs.environment }}-cluster
+          task-definition: ${{ inputs.environment }}-task
+          cluster: ${{ inputs.environment }}-cluster
 
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
