@@ -46,6 +46,14 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
+      - name: Add execution role to task definition
+        env:
+          EXECUTION_ROLE_ARN: ${{ vars.ECS_TASK_EXECUTION_ROLE_ARN }}
+        run: |
+          jq --arg role "$EXECUTION_ROLE_ARN" \
+           '.executionRoleArn = $role' \
+           task-definition.json > task-definition-updated.json
+          mv task-definition-updated.json task-definition.json    
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
