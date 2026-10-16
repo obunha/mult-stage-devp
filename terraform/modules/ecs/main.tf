@@ -24,41 +24,15 @@ resource "aws_ecs_cluster" "main" {
   name = "${var.env}-cluster"
 }
 
-resource "aws_ecs_task_definition" "app" {
-  family                   = "${var.env}-task"
-  network_mode             = "awsvpc"
-  requires_compatibilities = ["FARGATE"]
-  cpu                      = "256"
-  memory                   = "512"
-  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
-
-  container_definitions = jsonencode([
-    {
-      name      = "app"
-      image     = var.image_url
-      essential = true
-      portMappings = [
-        {
-          containerPort = 3000
-          hostPort      = 3000
-        }
-      ]
-      logConfiguration = {
-        logDriver = "awslogs"
-        options = {
-          "awslogs-group"         = "/ecs/${var.env}-app"
-          "awslogs-region"        = var.region
-          "awslogs-stream-prefix" = "ecs"
-        }
-      }
-    }
-  ])
-}
-
 resource "aws_ecs_service" "main" {
   name            = "${var.env}-service"
   cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_ecs_task_definition.app.arn
+  # Task definition is now managed by GitHub Actions
+  # We provide a dummy or initial task definition if required,
+  # but usually we create the service after the first deploy or use a placeholder.
+  # To avoid Terraform errors, we will remove the task_definition requirement
+  # by using a lifecycle ignore or managing it via the CI/CD pipeline.
+
   desired_count   = 1
   launch_type     = "FARGATE"
 
@@ -66,6 +40,10 @@ resource "aws_ecs_service" "main" {
     subnets          = var.subnets
     assign_public_ip = true
     security_groups  = [var.security_group_id]
+  }
+
+  lifecycle {
+    ignore_changes = [task_definition]
   }
 }
 
@@ -79,8 +57,4 @@ output "service_name" {
 
 output "cluster_name" {
   value = aws_ecs_cluster.main.name
-}
-
-output "task_definition_arn" {
-  value = aws_ecs_task_definition.app.arn
 }
