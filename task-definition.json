@@ -16,7 +16,7 @@
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/ecs/multistage-app",
+          "awslogs-group": "LOG_GROUP_PLACEHOLDER",
           "awslogs-region": "af-south-1",
           "awslogs-stream-prefix": "ecs"
         }
