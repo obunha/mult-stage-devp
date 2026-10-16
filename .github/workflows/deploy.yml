@@ -53,7 +53,7 @@ jobs:
         run: |
           jq --arg role "$EXECUTION_ROLE_ARN" \
              --arg loggroup "$LOG_GROUP" \
-             '.containerDefinitions[0].logConfiguration.options.awslogs-group = $loggroup | .executionRoleArn = $role' \
+             '.containerDefinitions[0].logConfiguration.options["awslogs-group"] = $loggroup | .executionRoleArn = $role' \
              task-definition.json > task-definition-updated.json
           mv task-definition-updated.json task-definition.json
 
